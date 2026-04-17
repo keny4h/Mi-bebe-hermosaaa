@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+<title>Te amo mi bebe 💓</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --rose:#FFC0CB;--cream:#FFFDD0;--blush:#FFB3C6;--gold:#C9A96E;
+  --deep-rose:#E8759A;--soft-red:#D4516B;--white:#fff;
+  --text-dark:#4a2030;--text-mid:#7a4560;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:linear-gradient(135deg,#fff5f8 0%,#fffdd0 50%,#fff0f5 100%);
+  font-family:'Lato',sans-serif;color:var(--text-dark);overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* ── CANVAS CORAZONES ── */
+#heartCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+/* ── AUDIO BTN ── */
+#audioBtn{
+  position:fixed;bottom:24px;right:24px;z-index:100;
+  width:52px;height:52px;border-radius:50%;border:2px solid var(--deep-rose);
+  background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(212,81,107,0.3);transition:transform 0.2s,box-shadow 0.2s;
+}
+#audioBtn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(212,81,107,0.45);}
+#audioBtn svg{width:22px;height:22px;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:99;
+  display:flex;justify-content:center;gap:2rem;padding:14px 24px;
+  background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,192,203,0.4);
+}
+nav a{
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;letter-spacing:.08em;
+  color:var(--text-mid);text-decoration:none;text-transform:uppercase;
+  transition:color 0.2s;
+}
+nav a:hover{color:var(--deep-rose);}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:1;width:100%;}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:100px 24px 60px;
+}
+.hero-label{
+  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;
+  animation:fadeUp 1s ease both;
+}
+.hero-title{
+  font-family:'Dancing Script',cursive;font-size:clamp(3rem,10vw,6.5rem);
+  color:var(--soft-red);line-height:1.1;
+  animation:fadeUp 1s .2s ease both;
+  text-shadow:0 2px 30px rgba(212,81,107,0.2);
+}
+.hero-sub{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1rem,3vw,1.35rem);color:var(--text-mid);
+  margin-top:1.5rem;animation:fadeUp 1s .4s ease both;
+}
+.hero-date{
+  margin-top:2.5rem;font-size:13px;letter-spacing:.2em;color:var(--gold);
+  animation:fadeUp 1s .6s ease both;
+}
+.hero-heart{
+  margin-top:2rem;animation:pulse 2s infinite,fadeUp 1s .8s ease both;
+  animation-fill-mode:both;
+}
+.hero-image-wrap{
+  margin-top:3rem;animation:fadeUp 1s 1s ease both;
+}
+.hero-image-wrap img{
+  width:min(260px,70vw);border-radius:50%;
+  border:4px solid rgba(255,192,203,0.6);
+  box-shadow:0 8px 40px rgba(212,81,107,0.25);
+  object-fit:cover;
+}
+
+/* ── MESSAGES ── */
+#mensajes{padding:80px 24px;}
+.section-title{
+  font-family:'Dancing Script',cursive;font-size:clamp(2rem,7vw,3.5rem);
+  color:var(--soft-red);text-align:center;margin-bottom:.5rem;
+}
+.section-sub{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1rem;color:var(--text-mid);text-align:center;margin-bottom:3rem;
+}
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:20px;max-width:900px;margin:0 auto;
+}
+.msg-card{
+  background:rgba(255,255,255,0.75);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,192,203,0.5);border-radius:20px;
+  padding:28px 24px;cursor:pointer;text-align:center;
+  transition:transform 0.25s,box-shadow 0.25s;
+  position:relative;overflow:hidden;
+}
+.msg-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,192,203,0.15),rgba(255,253,208,0.15));
+  opacity:0;transition:opacity 0.3s;
+}
+.msg-card:hover::before{opacity:1;}
+.msg-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(212,81,107,0.2);}
+.card-icon{font-size:2rem;margin-bottom:12px;display:block;}
+.card-title{
+  font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:600;
+  color:var(--text-dark);margin-bottom:6px;
+}
+.card-hint{font-size:.82rem;color:var(--text-mid);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(74,32,48,0.45);
+  display:flex;align-items:center;justify-content:center;
+  z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s;
+  padding:24px;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{
+  background:#fff;border-radius:24px;padding:40px 36px;max-width:460px;width:100%;
+  text-align:center;position:relative;
+  transform:translateY(20px) scale(0.97);transition:transform 0.3s;
+  box-shadow:0 20px 60px rgba(212,81,107,0.25);
+}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+.modal-icon{font-size:2.5rem;margin-bottom:16px;}
+.modal-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1.15rem;line-height:1.7;color:var(--text-dark);margin-bottom:20px;
+}
+.modal-close{
+  border:none;background:var(--deep-rose);color:#fff;
+  border-radius:50px;padding:10px 28px;font-size:.9rem;
+  cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:.05em;
+  transition:background 0.2s,transform 0.2s;
+}
+.modal-close:hover{background:var(--soft-red);transform:scale(1.04);}
+
+/* ── GALLERY ── */
+#galeria{padding:80px 24px;}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;max-width:960px;margin:0 auto;
+}
+.gallery-item{
+  position:relative;border-radius:20px;overflow:hidden;
+  aspect-ratio:1;background:linear-gradient(135deg,#ffc0cb33,#fffdd044);
+  border:1px solid rgba(255,192,203,0.4);
+  box-shadow:0 4px 20px rgba(212,81,107,0.12);
+  transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;
+}
+.gallery-item:hover{transform:scale(1.04);box-shadow:0 8px 32px rgba(212,81,107,0.28);}
+.gallery-item img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform 0.4s;display:block;
+}
+.gallery-item:hover img{transform:scale(1.06);}
+.gallery-item .overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(212,81,107,0.55),transparent);
+  opacity:0;transition:opacity 0.3s;display:flex;align-items:flex-end;
+  padding:14px;
+}
+.gallery-item:hover .overlay{opacity:1;}
+.overlay-text{
+  font-family:'Dancing Script',cursive;font-size:1.1rem;color:#fff;
+}
+
+/* ── CONTADOR ── */
+#contador{
+  padding:80px 24px;text-align:center;
+}
+.counter-wrap{
+  display:inline-flex;gap:32px;flex-wrap:wrap;
+  justify-content:center;margin-top:2.5rem;
+}
+.count-block{
+  background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,192,203,0.5);border-radius:20px;
+  padding:24px 28px;min-width:100px;
+}
+.count-num{
+  font-family:'Dancing Script',cursive;font-size:3rem;
+  color:var(--soft-red);display:block;line-height:1;
+}
+.count-label{
+  font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-mid);margin-top:6px;display:block;
+}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:40px 24px;
+  border-top:1px solid rgba(255,192,203,0.3);
+  font-size:.82rem;color:var(--text-mid);letter-spacing:.08em;
+  font-family:'Playfair Display',serif;font-style:italic;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(30px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.15);}
+}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+@media(max-width:600px){
+  nav{gap:1.2rem;padding:12px 16px;}
+  nav a{font-size:11px;}
+  .modal-box{padding:28px 20px;}
+  .counter-wrap{gap:16px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="heartCanvas"></canvas>
+
+<nav>
+  <a href="#hero">Inicio</a>
+  <a href="#mensajes">Mensajes</a>
+  <a href="#galeria">Galería</a>
+  <a href="#contador">Contador</a>
+</nav>
+
+<!-- AUDIO -->
+<button id="audioBtn" title="Reproducir música">
+  <svg id="iconPlay" viewBox="0 0 24 24" fill="none" stroke="#D4516B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="#D4516B" stroke="none"/>
+  </svg>
+  <svg id="iconPause" viewBox="0 0 24 24" fill="none" stroke="#D4516B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <circle cx="12" cy="12" r="10"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="8" x2="14" y2="16"/>
+  </svg>
+</button>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="hero-label">✦ Hoy comienza nuestra historia ✦</p>
+  <h1 class="hero-title">Te amo mi bebe💓</h1>
+  <p class="hero-sub">Desde hoy, cada día a tu lado<br>es el más especial de mi vida.</p>
+  <p class="hero-date">✦ Día 1 de muchos juntos ✦</p>
+  <div class="hero-heart">
+    <svg width="60" height="55" viewBox="0 0 60 55">
+      <defs>
+        <radialGradient id="hg" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#FFB3C6"/>
+          <stop offset="100%" stop-color="#D4516B"/>
+        </radialGradient>
+      </defs>
+      <path d="M30 50 C30 50 5 33 5 17 C5 8 12 3 20 5 C24 6 27 9 30 13 C33 9 36 6 40 5 C48 3 55 8 55 17 C55 33 30 50 30 50Z" fill="url(#hg)" filter="drop-shadow(0 4px 12px rgba(212,81,107,0.4))"/>
+    </svg>
+  </div>
+  <div class="hero-image-wrap">
+    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&q=80" alt="cute couple aesthetic"/>
+  </div>
+</section>
+
+<!-- MENSAJES -->
+<section id="mensajes">
+  <h2 class="section-title reveal">Mensajes para ti 💌</h2>
+  <p class="section-sub reveal">Haz clic en cada carta y descubre lo que siento</p>
+  <div class="cards-grid">
+    <div class="msg-card reveal" onclick="openModal(0)">
+      <span class="card-icon">🌹</span>
+      <p class="card-title">Desde el primer momento</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+    <div class="msg-card reveal" onclick="openModal(1)">
+      <span class="card-icon">✨</span>
+      <p class="card-title">Lo que más me gusta de ti</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+    <div class="msg-card reveal" onclick="openModal(2)">
+      <span class="card-icon">🌙</span>
+      <p class="card-title">Mis promesas</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+    <div class="msg-card reveal" onclick="openModal(3)">
+      <span class="card-icon">💫</span>
+      <p class="card-title">Nuestro futuro</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+    <div class="msg-card reveal" onclick="openModal(4)">
+      <span class="card-icon">🎀</span>
+      <p class="card-title">Hoy y siempre</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+    <div class="msg-card reveal" onclick="openModal(5)">
+      <span class="card-icon">💝</span>
+      <p class="card-title">Mi corazón es tuyo</p>
+      <p class="card-hint">Toca para leer</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <h2 class="section-title reveal">Galería de amor 🎀</h2>
+  <p class="section-sub reveal">Imágenes que me recuerdan a lo nuestro</p>
+  <div class="gallery-grid">
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&q=80" alt="romantic"/>
+      <div class="overlay"><span class="overlay-text">Nuestro amor</span></div>
+    </div>
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&q=80" alt="couple"/>
+      <div class="overlay"><span class="overlay-text">Contigo</span></div>
+    </div>
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1505932794465-147d1f1b2c97?w=400&q=80" alt="flowers"/>
+      <div class="overlay"><span class="overlay-text">Para ti</span></div>
+    </div>
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=400&q=80" alt="aesthetic"/>
+      <div class="overlay"><span class="overlay-text">Momentos</span></div>
+    </div>
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=400&q=80" alt="love"/>
+      <div class="overlay"><span class="overlay-text">Siempre</span></div>
+    </div>
+    <div class="gallery-item reveal">
+      <img src="https://images.unsplash.com/photo-1585128792020-803d29415281?w=400&q=80" alt="hearts"/>
+      <div class="overlay"><span class="overlay-text">Mi todo</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTADOR -->
+<section id="contador">
+  <h2 class="section-title reveal">Nuestro primer día ⏳</h2>
+  <p class="section-sub reveal">Cada segundo que pasa, te amo más</p>
+  <div class="counter-wrap reveal" id="counterWrap">
+    <div class="count-block">
+      <span class="count-num" id="cHrs">00</span>
+      <span class="count-label">horas</span>
+    </div>
+    <div class="count-block">
+      <span class="count-num" id="cMin">00</span>
+      <span class="count-label">minutos</span>
+    </div>
+    <div class="count-block">
+      <span class="count-num" id="cSec">00</span>
+      <span class="count-label">segundos</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Hecho con amor por <em>Kenyah</em> &nbsp;💓&nbsp; Para quien más amo en el mundo</p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-icon" id="mIcon"></div>
+    <p class="modal-text" id="mText"></p>
+    <button class="modal-close" onclick="closeModal()">Con amor 💓</button>
+  </div>
+</div>
+
+<script>
+/* ─── MENSAJES ─── */
+const msgs=[
+  {icon:'🌹',text:'Desde el primer instante en que te vi, supe que algo especial estaba comenzando. Hay personas que llegan a tu vida sin avisar y la llenan de luz para siempre. Tú eres esa persona para mí.'},
+  {icon:'✨',text:'Me encanta tu sonrisa, cómo brilla tu mirada cuando ríes, la manera en que me haces sentir que el mundo es mejor lugar. Cada pequeño detalle tuyo me enamora más.'},
+  {icon:'🌙',text:'Te prometo estar ahí en los días brillantes y en los nublados. Prometo escucharte, cuidarte y elegirte cada mañana. Hoy y siempre, mi corazón es tuyo.'},
+  {icon:'💫',text:'Me imagino miles de días a tu lado, aventuras que aún no conocemos, risas que todavía no hemos reído. Contigo el futuro se ve lleno de cosas hermosas.'},
+  {icon:'🎀',text:'Hoy es apenas el primero de los días más felices de mi vida. Que este sea el inicio de algo que dure para siempre, de algo que los dos construyamos juntos con amor.'},
+  {icon:'💝',text:'Mi corazón te eligió a ti. No porque fuera perfecto el momento, sino porque tú eres la persona correcta. Eres mi persona favorita en todo el universo.'},
+];
+
+function openModal(i){
+  document.getElementById('mIcon').textContent=msgs[i].icon;
+  document.getElementById('mText').textContent=msgs[i].text;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ─── CONTADOR ─── */
+const start=new Date();
+setInterval(()=>{
+  const diff=Math.floor((new Date()-start)/1000);
+  const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+  document.getElementById('cHrs').textContent=String(h).padStart(2,'0');
+  document.getElementById('cMin').textContent=String(m).padStart(2,'0');
+  document.getElementById('cSec').textContent=String(s).padStart(2,'0');
+},1000);
+
+/* ─── SCROLL REVEAL ─── */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ─── AUDIO ─── */
+const audio=new Audio();
+audio.crossOrigin='anonymous';
+// SoundCloud directo no es streamable vía <audio>; usamos iframe oculto
+const scFrame=document.createElement('iframe');
+scFrame.src='https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/user-93652600-773373618/rpreplay-final1713832592&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false';
+scFrame.allow='autoplay';
+scFrame.style.cssText='position:fixed;bottom:-999px;left:-999px;width:1px;height:1px;opacity:0;';
+document.body.appendChild(scFrame);
+
+let playing=false;
+const SC=window.SC||{};
+document.getElementById('audioBtn').addEventListener('click',()=>{
+  playing=!playing;
+  const msg=playing?'play':'pause';
+  scFrame.contentWindow.postMessage(JSON.stringify({method:msg}),'https://w.soundcloud.com');
+  document.getElementById('iconPlay').style.display=playing?'none':'block';
+  document.getElementById('iconPause').style.display=playing?'block':'none';
+});
+
+/* ─── CORAZONES EN CANVAS ─── */
+const canvas=document.getElementById('heartCanvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+function heartPath(ctx,x,y,s){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.beginPath();
+  ctx.moveTo(0,-5);
+  ctx.bezierCurveTo(5,-15,18,-12,18,0);
+  ctx.bezierCurveTo(18,10,0,22,0,26);
+  ctx.bezierCurveTo(0,22,-18,10,-18,0);
+  ctx.bezierCurveTo(-18,-12,-5,-15,0,-5);
+  ctx.closePath();ctx.restore();
+}
+
+const hearts=Array.from({length:28},()=>({
+  x:Math.random()*window.innerWidth,
+  y:Math.random()*window.innerHeight+window.innerHeight,
+  s:0.4+Math.random()*0.9,
+  sp:0.4+Math.random()*1.2,
+  op:0.15+Math.random()*0.45,
+  drift:(Math.random()-0.5)*0.6,
+  wobble:Math.random()*Math.PI*2,
+}));
+
+// Corazones que siguen el cursor
+let mHearts=[];
+document.addEventListener('mousemove',e=>{
+  if(Math.random()<0.35){
+    mHearts.push({x:e.clientX,y:e.clientY,s:0.3+Math.random()*0.6,op:0.7,vy:-2-Math.random(),vx:(Math.random()-0.5)*2,life:1});
+  }
+});
+document.addEventListener('touchmove',e=>{
+  const t=e.touches[0];
+  mHearts.push({x:t.clientX,y:t.clientY,s:0.4,op:0.7,vy:-2,vx:(Math.random()-0.5)*2,life:1});
+},{passive:true});
+
+function drawHeart(x,y,s,op,col){
+  const grad=ctx.createRadialGradient(x,y-s*6,s,x,y,s*20);
+  grad.addColorStop(0,'rgba(255,200,215,'+op+')');
+  grad.addColorStop(1,'rgba(212,81,107,'+op+')');
+  heartPath(ctx,x,y,s);
+  ctx.fillStyle=grad;
+  ctx.shadowColor='rgba(212,81,107,0.3)';
+  ctx.shadowBlur=8*s;
+  ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  const t=performance.now()/1000;
+  hearts.forEach(h=>{
+    h.y-=h.sp*0.4;
+    h.x+=Math.sin(t+h.wobble)*h.drift;
+    if(h.y<-40){h.y=H+40;h.x=Math.random()*W;}
+    drawHeart(h.x,h.y,h.s,h.op);
+  });
+  mHearts=mHearts.filter(h=>{
+    h.x+=h.vx;h.y+=h.vy;h.op-=0.018;h.life-=0.018;
+    if(h.op>0)drawHeart(h.x,h.y,h.s,h.op);
+    return h.op>0;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
